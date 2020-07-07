@@ -42,7 +42,7 @@ export function* addNewProduct({ payload }) {
 
     if (response.data) {
       yield put(addNewProductSuccess());
-      toast.error('Registro salvo');
+      toast.success('Registro salvo');
       history.push('/products');
     }
   } catch (error) {
