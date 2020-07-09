@@ -3,8 +3,9 @@ import produce from 'immer';
 const INITIAL_STATE = {
   products: [],
   productEdit: {},
-  productID: null,
   loading: false,
+  productID: null,
+  productIndex: null,
   filterCategory: [],
   filterMark: [],
 };
@@ -43,8 +44,16 @@ export default function product(state = INITIAL_STATE, action) {
         );
         break;
       }
+      case '@product/DELETE_PRODUCT_REQUEST': {
+        draft.productIndex = null;
+        draft.productIndex = draft.products.findIndex(
+          (p) => p._id === action.payload._id
+        );
+        break;
+      }
       case '@product/DELETE_PRODUCT_SUCCESS': {
-        draft.products.splice((p) => p._id === action.payload._id, 1);
+        draft.products.splice(draft.productIndex, 1);
+        draft.productID = null;
         break;
       }
       case '@product/FAILURE': {

@@ -4,6 +4,7 @@ const INITIAL_STATE = {
   marks: [],
   markEdit: {},
   markID: null,
+  markIndex: null,
   loading: false,
 };
 export default function mark(state = INITIAL_STATE, action) {
@@ -30,21 +31,22 @@ export default function mark(state = INITIAL_STATE, action) {
         break;
       }
       case '@mark/DELETE_MARK_REQUEST': {
-        draft.markID = null;
-        draft.markID = action.payload._id;
+        draft.markIndex = null;
+        draft.markIndex = draft.marks.findIndex(
+          (m) => m._id === action.payload._id
+        );
         break;
       }
       case '@mark/DELETE_MARK_SUCCESS': {
         draft.markEdit = {};
         draft.markID = null;
-        draft.marks.splice((m) => m._id === action.payload._id, 1);
+        draft.marks.splice(draft.markIndex, 1);
         break;
       }
       case '@mark/FAILURE_MARK': {
         draft.loading = false;
         break;
       }
-
       default:
     }
   });

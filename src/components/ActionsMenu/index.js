@@ -34,7 +34,10 @@ export function OptionsCategory({ category }) {
     history.push('/category-edit');
   }
   function handleDelete() {
-    dispatch(deleteCategoryRequest(_id));
+    const confir = window.confirm('Deseja realmente deletar');
+    if (confir) {
+      dispatch(deleteCategoryRequest(_id));
+    }
   }
 
   return (

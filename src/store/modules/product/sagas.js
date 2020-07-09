@@ -62,7 +62,8 @@ export function* loadEditProduct() {
 export function* deleteProduct({ payload }) {
   try {
     const { _id } = payload;
-    yield call(api.delete, `products/${_id}`);
+    const response = yield call(api.delete, `products/${_id}`);
+    console.tron.log(response.data);
 
     yield put(deleteProductSuccess(_id));
     toast.success('Registro deletado');
