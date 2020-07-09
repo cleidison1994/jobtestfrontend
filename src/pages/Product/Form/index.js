@@ -33,8 +33,8 @@ export default function ProductNew() {
     async function loadData() {
       try {
         const [categoryResponse, markResponse] = await Promise.all([
-          api.get('/marks'),
           api.get('/categories'),
+          api.get('/marks'),
         ]);
         setDropCategory(categoryResponse.data);
         setDropMark(markResponse.data);
