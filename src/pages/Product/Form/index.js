@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useMemo, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { MdDone, MdArrowForward } from 'react-icons/md';
 import { Form } from '@unform/web';
@@ -23,38 +23,47 @@ import {
 export default function ProductNew() {
   const ref = useRef(null);
   const dispatch = useDispatch();
-  const [category_id, setDropCategory] = useState('');
-  const [mark_id, setDropMark] = useState('');
+  const [category, setDropCategory] = useState([]);
+  const [mark, setDropMark] = useState([]);
+  const [category_id, setCategory_id] = useState(null);
+  const [mark_id, setMark_id] = useState(null);
   const loading = useSelector((state) => state.product.loading);
 
-  async function dropDowMark(inputValue, callback) {
-    const response = await api.get('/marks');
-
-    const data = response.data.map((mark) => ({
-      value: mark._id,
-      label: mark.name,
+  useEffect(() => {
+    async function loadData() {
+      try {
+        const [categoryResponse, markResponse] = await Promise.all([
+          api.get('/marks'),
+          api.get('/categories'),
+        ]);
+        setDropCategory(categoryResponse.data);
+        setDropMark(markResponse.data);
+      } catch (error) {
+        toast.error(`Ocorreu um erro ${error}`);
+      }
+    }
+    loadData();
+  }, []);
+  const categoryOption = useMemo(() => {
+    return category.map((categories) => ({
+      value: categories._id,
+      label: categories.name,
     }));
+  }, [category]);
 
-    setTimeout(() => {
-      callback(data, 1000);
-    }, 1000);
-  }
-  async function dropDowCategory(inputValue, callback) {
-    const response = await api.get('/categories');
-
-    const data = response.data.map((category) => ({
-      value: category._id,
-      label: category.name,
+  const markOption = useMemo(() => {
+    return mark.map((marks) => ({
+      value: marks._id,
+      label: marks.name,
     }));
-    setTimeout(() => {
-      callback(data, 1000);
-    }, 1000);
+  }, [mark]);
+  function getChangeCategory(selectedOption) {
+    const { value } = selectedOption;
+    setCategory_id(value);
   }
-  function getSelectCategory({ value }) {
-    setDropCategory(value);
-  }
-  function getSelectMark({ value }) {
-    setDropMark(value);
+  function getChangeMark(selectedOption) {
+    const { value } = selectedOption;
+    setMark_id(value);
   }
 
   async function handleAddDeliveryMan({ name, description, ammount, price }) {
@@ -136,23 +145,41 @@ export default function ProductNew() {
             <div>
               <span>Categoria</span>
               <SelectInput
+                isSearchable={false}
                 name="category_id"
                 cacheOptions
-                placeholder="Busque uma categoria"
+                placeholder="Selecione uma categoria"
                 noOptionsMessage={() => 'Nenhuma categoria encntrada'}
-                loadOptions={dropDowCategory}
-                onChange={(option) => getSelectCategory(option)}
+                options={categoryOption}
+                onChange={getChangeCategory}
+                defaultOptions={
+                  category
+                    ? {
+                        label: category.name,
+                        value: category._id,
+                      }
+                    : undefined
+                }
               />
             </div>
             <div>
               <span>Marca</span>
               <SelectInput
                 name="mark_id"
+                isSearchable={false}
                 cacheOptions
-                placeholder="Busque uma marca"
+                placeholder="Selecione uma marca"
                 noOptionsMessage={() => 'Nenhuma marca encntrada'}
-                loadOptions={dropDowMark}
-                onChange={(option) => getSelectMark(option)}
+                options={markOption}
+                onChange={getChangeMark}
+                defaultOptions={
+                  mark
+                    ? {
+                        label: mark.name,
+                        value: mark._id,
+                      }
+                    : undefined
+                }
               />
             </div>
           </ContainerSelect>

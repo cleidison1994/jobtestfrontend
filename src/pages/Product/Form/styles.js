@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import select from 'react-select/async';
+import select from 'react-select';
 import { darken } from 'polished';
 
 export const Container = styled.div`
